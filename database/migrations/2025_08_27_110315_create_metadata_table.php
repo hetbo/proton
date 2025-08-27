@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('value');
             $table->timestamps();
 
+            $table->unique(['file_id', 'key']);
             $table->index(['file_id', 'key']);
 
         });

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 require __DIR__ . '/files.php';
+require __DIR__ . '/metadata.php';
 
 Route::get('/', function () {
     return view('welcome');
