@@ -43,4 +43,14 @@ class User extends Authenticatable
     {
         return $this->getFirstFileByRole('banner');
     }
+
+    public function hasRole(string $role): bool
+    {
+        return $this->role === $role;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
+    }
 }
