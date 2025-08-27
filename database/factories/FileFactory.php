@@ -17,7 +17,10 @@ class FileFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'filename' => $this->faker->name(),
+            'path' => $this->faker->filePath(),
+            'mime_type' => $this->faker->mimeType(),
+            'size' => $this->faker->numberBetween(100,100000000),
         ];
     }
 }
