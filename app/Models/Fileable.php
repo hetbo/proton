@@ -16,6 +16,10 @@ class Fileable extends Model
         'role',
     ];
 
+    protected $hidden = [
+        'created_at', 'updated_at',
+    ];
+
     public function file()
     {
         return $this->belongsTo(File::class);
