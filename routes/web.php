@@ -25,3 +25,5 @@ Route::get('/logout', function () {
 Route::get('/login', function () {
     return ['message' => 'use quick login'];
 })->name('login');
+
+Route::view('/shelf', 'shelf.index');
