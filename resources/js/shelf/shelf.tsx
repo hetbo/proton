@@ -1,7 +1,8 @@
 import '../bootstrap';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './components/App';
+import App from './components/FileManager';
+import FileManager from "./components/FileManager";
 
 const rootElement = document.getElementById('app');
 
@@ -9,7 +10,7 @@ if (rootElement) {
     const root = ReactDOM.createRoot(rootElement);
     root.render(
         <>
-            <App />
+            <FileManager />
         </>
     );
 } else {
