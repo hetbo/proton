@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 require __DIR__ . '/files.php';
 require __DIR__ . '/metadata.php';
+require __DIR__ . '/fileables.php';
 
 Route::get('/', function () {
     return view('welcome');

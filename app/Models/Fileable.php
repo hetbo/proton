@@ -17,8 +17,10 @@ class Fileable extends Model
     ];
 
     protected $hidden = [
-        'created_at', 'updated_at',
+        'created_at', 'updated_at', 'fileable_type'
     ];
+
+    protected $appends = ['type'];
 
     public function file()
     {
@@ -30,13 +32,11 @@ class Fileable extends Model
         return $this->morphTo();
     }
 
-    // Helper methods
     public function isRole(string $role): bool
     {
         return $this->role === $role;
     }
 
-    // Scopes for common queries
     public function scopeWithRole($query, string $role)
     {
         return $query->where('role', $role);
@@ -47,4 +47,15 @@ class Fileable extends Model
         return $query->where('fileable_type', get_class($model))
             ->where('fileable_id', $model->id);
     }
+
+    public function getTypeAttribute(): ?string
+    {
+        if (!$this->fileable_type) {
+            return null;
+        }
+
+        return class_basename($this->fileable_type);
+    }
+
+
 }

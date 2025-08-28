@@ -13,7 +13,7 @@ trait HasFiles
     public function files(): MorphToMany
     {
         return $this->morphToMany(File::class, 'fileable')
-            ->withPivot(['role'])
+            ->withPivot('role')
             ->withTimestamps();
     }
 
@@ -24,7 +24,7 @@ trait HasFiles
 
     public function attachFile(File $file, string $role): Fileable
     {
-        return $this->fileables()->updateOrCreate([
+        return $this->fileables()->create([
             'file_id' => $file->id,
             'role' => $role,
         ]);
