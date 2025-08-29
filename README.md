@@ -21,11 +21,11 @@ A modern, responsive file management interface built with React and TypeScript. 
 
 ## Tech Stack
 
-- **Frontend**: React 18 with TypeScript
+- **Frontend**: React 19 with TypeScript
 - **Styling**: Tailwind CSS
-- **Icons**: Lucide React
-- **State Management**: Zustand (assumed from store usage)
-- **Backend**: Laravel (API endpoints)
+- **Icons**: SVGRepo
+- **State Management**: Zustand
+- **Backend**: Laravel 12 (API endpoints)
 
 ## Component Architecture
 
