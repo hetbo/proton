@@ -1,3 +1,3 @@
 import './bootstrap';
 import './WebComponents/hello-world'
-import './WebComponents/shelf-file'
+import './shelf/shelf-file.js'
