@@ -52,4 +52,32 @@ export interface ApiResponse<T = any> {
     data?: T;
 }
 
+interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+export interface PaginatedFilesResponse {
+    current_page: number;
+    data: ShelfFile[];
+    first_page_url: string;
+    from: number;
+    last_page: number;
+    last_page_url: string;
+    links: PaginationLink[];
+    next_page_url: string | null;
+    path: string;
+    per_page: number;
+    prev_page_url: string | null;
+    to: number;
+    total: number;
+}
+
+export interface AttachResponse {
+    success: boolean;
+    message?: string;
+    data?: ShelfFile;
+}
+
 export type ViewMode = 'list' | 'grid';
