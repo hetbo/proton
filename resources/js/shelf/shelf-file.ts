@@ -17,6 +17,14 @@ class FileShelf extends HTMLElement {
 
     private attachedFileIds: Set<number> = new Set();
 
+    private modalFilters = {
+        search: '',
+        sort: '-date',
+        type: '',
+        year: '',
+        month: ''
+    };
+
     constructor() {
         super();
         this.shadow = this.attachShadow({ mode: 'open' });
@@ -38,6 +46,34 @@ class FileShelf extends HTMLElement {
             this.render();
         } catch (error) {
             this.renderError(error instanceof Error ? error.message : 'An unknown error occurred.');
+        }
+    }
+
+    private async fetchAndRenderModalData() {
+        this.isModalLoading = true;
+        this.modalError = null;
+        this.render();
+
+        const params = new URLSearchParams();
+        if (this.modalFilters.search) {
+            params.set('search', this.modalFilters.search);
+        }
+        if (this.modalFilters.sort) {
+            params.set('sort', this.modalFilters.sort);
+        }
+        if (this.modalFilters.type) {
+            params.set('type', this.modalFilters.type);
+        }
+
+        const url = `/files?${params.toString()}`;
+
+        try {
+            this.modalData = await this.fetchModalData(url);
+        } catch (error) {
+            this.modalError = error instanceof Error ? error.message : 'Could not load media.';
+        } finally {
+            this.isModalLoading = false;
+            this.render();
         }
     }
 
@@ -82,13 +118,12 @@ class FileShelf extends HTMLElement {
         });
 
         if (!response.ok) {
-            // We'll improve this part below
             throw new Error(`API request failed with status ${response.status}`);
         }
         const result: AttachResponse = await response.json();
 
         if (!result.success) {
-            // Pass the specific message from the API
+
             throw new Error(result.message || 'API returned an error while attaching the file.');
         }
     }
@@ -147,26 +182,19 @@ class FileShelf extends HTMLElement {
         }
     }
 
-    private handleChooseMedia = async () => {
-        this.isModalOpen = true;
-        this.isModalLoading = true;
-        this.modalError = null;
-        this.attachedFileIds = new Set(this.files.map(f => f.id));
-        this.render();
 
-        try {
-            this.modalData = await this.fetchModalData();
-        } catch (error) {
-            this.modalError = error instanceof Error ? error.message : 'Could not load media.';
-        } finally {
-            this.isModalLoading = false;
-            this.render();
-        }
+    private handleChooseMedia = () => {
+        this.isModalOpen = true;
+        this.attachedFileIds = new Set(this.files.map(f => f.id));
+
+        this.modalFilters = { search: '', sort: '-date', type: '', year: '', month: '' };
+
+        this.fetchAndRenderModalData();
     }
 
     private handleCloseModal = () => {
         this.isModalOpen = false;
-        this.modalData = null; // Clear data when closing
+        this.modalData = null;
         this.modalError = null;
         this.render();
     }
@@ -176,7 +204,7 @@ class FileShelf extends HTMLElement {
 
         // --- Optimistic Update ---
         this.files = this.files.filter(f => f.id !== fileId);
-        this.attachedFileIds.delete(fileId); // Also update the set for the modal buttons
+        this.attachedFileIds.delete(fileId);
         this.render();
 
         try {
@@ -186,7 +214,7 @@ class FileShelf extends HTMLElement {
             this.files = originalFiles;
             this.attachedFileIds.add(fileId);
             this.render();
-            // Use the specific error message from the API
+
             alert(error instanceof Error ? error.message : 'Could not remove the file. Please try again.');
         }
     }
@@ -223,28 +251,26 @@ class FileShelf extends HTMLElement {
     }
 
     private async handleAttach(fileId: number) {
-        // Find the full file object from our loaded modal data
+
         const fileToAttach = this.modalData?.data.find(f => f.id === fileId);
         if (!fileToAttach) {
             console.error('File to attach not found in modal data.');
             return;
         }
 
-        // --- Optimistic Update ---
-        // Immediately add the file to the UI and re-render everything.
         this.files.push(fileToAttach);
-        this.attachedFileIds.add(fileId); // Update the set so the button changes in the modal
+        this.attachedFileIds.add(fileId);
         this.render();
 
         try {
-            // Make the actual API call
+
             await this.attachFile(fileId);
         } catch (error) {
             console.error('Failed to attach file:', error);
             this.files = this.files.filter(f => f.id !== fileId);
             this.attachedFileIds.delete(fileId);
             this.render();
-            // Use the specific error message from the API
+
             alert(error instanceof Error ? error.message : 'Could not attach the file. Please try again.');
         }
     }
@@ -253,7 +279,7 @@ class FileShelf extends HTMLElement {
     private handlePaginationClick = async (url: string) => {
         this.isModalLoading = true;
         this.modalError = null;
-        this.render(); // Show loading state in modal body
+        this.render();
 
         try {
             this.modalData = await this.fetchModalData(url);
@@ -261,7 +287,7 @@ class FileShelf extends HTMLElement {
             this.modalError = error instanceof Error ? error.message : 'Could not load page.';
         } finally {
             this.isModalLoading = false;
-            this.render(); // Re-render with new page data or error
+            this.render();
         }
     }
 
@@ -478,9 +504,33 @@ class FileShelf extends HTMLElement {
             return `<p class="error">${this.modalError}</p>`;
         }
 
+        const filtersHtml = `
+        <form id="modal-filters-form" class="modal-filters">
+            <div class="filter-group">
+                <input type="search" id="modal-search-input" placeholder="Search by filename..." value="${this.modalFilters.search}">
+                <button type="submit">Search</button>
+            </div>
+            <div class="filter-group">
+                <select id="modal-type-select">
+                    <option value="">All Types</option>
+                    <option value="image" ${this.modalFilters.type === 'image' ? 'selected' : ''}>Images</option>
+                    <option value="video" ${this.modalFilters.type === 'video' ? 'selected' : ''}>Videos</option>
+                    <option value="audio" ${this.modalFilters.type === 'audio' ? 'selected' : ''}>Audio</option>
+                    <option value="document" ${this.modalFilters.type === 'document' ? 'selected' : ''}>Documents</option>
+                    <option value="archive" ${this.modalFilters.type === 'archive' ? 'selected' : ''}>Archives</option>
+                </select>
+                <select id="modal-sort-select">
+                    <option value="-date" ${this.modalFilters.sort === '-date' ? 'selected' : ''}>Newest First</option>
+                    <option value="date" ${this.modalFilters.sort === 'date' ? 'selected' : ''}>Oldest First</option>
+                    <option value="-size" ${this.modalFilters.sort === '-size' ? 'selected' : ''}>Size (Largest)</option>
+                    <option value="size" ${this.modalFilters.sort === 'size' ? 'selected' : ''}>Size (Smallest)</option>
+                </select>
+            </div>
+        </form>
+    `;
+
         if (this.modalData && this.modalData.data.length > 0) {
             const filesHtml = this.modalData.data.map(file => {
-                // Check if the file's ID is in our set of attached files
                 const isAttached = this.attachedFileIds.has(file.id);
 
                 const buttonHtml = isAttached
@@ -512,10 +562,10 @@ class FileShelf extends HTMLElement {
                     `).join('')}
                 </div>`;
 
-            return `<div class="grid-container">${filesHtml}</div>${paginationHtml}`;
+            return `${filtersHtml}<div class="grid-container">${filesHtml}</div>${paginationHtml}`;
         }
 
-        return `<p>No media found.</p>`;
+        return `${filtersHtml}<p>No media found.</p>`;
     }
 
     private attachEventListeners() {
@@ -523,7 +573,31 @@ class FileShelf extends HTMLElement {
         this.shadow.querySelector('#choose-media-btn')?.addEventListener('click', this.handleChooseMedia);
         this.shadow.querySelector('#modal-close-btn')?.addEventListener('click', this.handleCloseModal);
         this.shadow.querySelector('.modal-content')?.addEventListener('click', this.handleModalClick);
+
+        this.shadow.querySelector('#modal-filters-form')?.addEventListener('submit', this.handleFilterSubmit);
     }
+
+    private handleFilterChange = (event: Event) => {
+        const target = event.target as HTMLSelectElement;
+
+        if (target.id === 'modal-type-select') {
+            this.modalFilters.type = target.value;
+        }
+        if (target.id === 'modal-sort-select') {
+            this.modalFilters.sort = target.value;
+        }
+        this.fetchAndRenderModalData();
+    }
+
+    private handleFilterSubmit = (event: Event) => {
+        event.preventDefault();
+        const searchInput = this.shadow.querySelector('#modal-search-input') as HTMLInputElement;
+        if (searchInput) {
+            this.modalFilters.search = searchInput.value;
+        }
+        this.fetchAndRenderModalData();
+    }
+
 
     private renderLoading() {
         this.shadow.innerHTML = `
