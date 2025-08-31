@@ -27,6 +27,14 @@ export interface Fileable {
     type: string;
 }
 
+export interface ModalFilters {
+    search: string;
+    sort: string;
+    type: string;
+    year: string;
+    month: string;
+}
+
 export interface PaginatedResponse<T> {
     data: T[];
     current_page: number;
@@ -44,6 +52,11 @@ export interface FilterOptions {
     sort?: 'date' | 'size' | '-size';
     search?: string;
     page?: number;
+}
+
+export interface DetachResponse {
+    success: boolean;
+    message?: string;
 }
 
 export interface ApiResponse<T = any> {
