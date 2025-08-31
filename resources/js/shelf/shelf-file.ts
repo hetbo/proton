@@ -294,217 +294,494 @@ class FileShelf extends HTMLElement {
 
     private getStyles(): string {
         return `
-            /* Tailwind-equivalent styles compiled for Shadow DOM */
+        * {
+            box-sizing: border-box;
+        }
+
+        /* Minimal container */
+        .shelf-container {
+            padding: 1rem;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            position: relative;
+        }
+
+        /* Tight grid */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Clean card design */
+        .grid-item {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 0.75rem 0.5rem;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+
+        .grid-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border-color: #6366f1;
+        }
+
+        /* Compact thumbnail */
+        .thumbnail {
+            width: 100%;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+            background: #f8fafc;
+            border-radius: 0.25rem;
+            overflow: hidden;
+        }
+
+        .thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.2s ease;
+        }
+
+        .grid-item:hover .thumbnail img {
+            transform: scale(1.02);
+        }
+
+        /* Smaller icons */
+        .icon {
+            font-size: 2rem;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+        .grid-item:hover .icon {
+            opacity: 0.9;
+        }
+
+        /* Compact typography */
+        .filename {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #475569;
+            word-break: break-word;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.3;
+        }
+
+        /* Minimal delete button */
+        .delete-btn {
+            position: absolute;
+            top: -0.25rem;
+            right: -0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 50%;
+            border: 1px solid white;
+            background: #ef4444;
+            color: white;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            line-height: 1;
+            transition: all 0.2s ease;
+            z-index: 20;
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        .grid-item:hover .delete-btn {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+
+        /* Simple button design */
+        .choose-media-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.625rem 1rem;
+            border: 1px solid #6366f1;
+            border-radius: 0.375rem;
+            background: #6366f1;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .choose-media-btn::before {
+            content: '📁';
+            font-size: 0.875rem;
+        }
+
+        .choose-media-btn:hover {
+            background: #5855f7;
+            border-color: #5855f7;
+            transform: translateY(-1px);
+        }
+
+        /* Minimal empty state */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 2rem 1rem;
+            color: #64748b;
+            background: #f8fafc;
+            border-radius: 0.375rem;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .empty-state::before {
+            content: '📂';
+            display: block;
+            font-size: 2rem;
+            margin-bottom: 0.375rem;
+            opacity: 0.6;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Clean modal overlay */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        /* Minimal modal design */
+        .modal-content {
+            position: relative;
+            background: #ffffff;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 800px;
+            height: 80vh;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        /* Simple close button */
+        .modal-close-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: #f1f5f9;
+            border: none;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 0.25rem;
+            font-size: 1rem;
+            cursor: pointer;
+            color: #64748b;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close-btn:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* Compact form styling */
+        .modal-filters {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.375rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group:last-child {
+            margin-bottom: 0;
+        }
+
+        input[type="search"], select, button[type="submit"] {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.25rem;
+            background: #ffffff;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        input[type="search"] {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        input[type="search"]:focus, select:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+        }
+
+        select:hover {
+            border-color: #94a3b8;
+        }
+
+        button[type="submit"] {
+            background: #6366f1;
+            color: white;
+            border-color: #6366f1;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button[type="submit"]:hover {
+            background: #5855f7;
+            border-color: #5855f7;
+        }
+
+        /* Compact action buttons */
+        .attach-btn, .detach-btn {
+            margin-top: 0.5rem;
+            padding: 0.375rem 0.75rem;
+            border: none;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .attach-btn {
+            background: #10b981;
+            color: white;
+        }
+
+        .attach-btn:hover {
+            background: #059669;
+        }
+
+        .detach-btn {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .detach-btn:hover {
+            background: #d97706;
+        }
+
+        /* Simple pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.25rem;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .pagination-link {
+            padding: 0.375rem 0.625rem;
+            border-radius: 0.25rem;
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+        }
+
+        .pagination-link:hover:not(.disabled) {
+            background: #6366f1;
+            color: white;
+            border-color: #6366f1;
+        }
+
+        .pagination-link.active {
+            background: #6366f1;
+            color: white;
+            border-color: #6366f1;
+        }
+
+        .pagination-link.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Minimal loading and error states */
+        .loading, .error {
+            padding: 1.5rem;
+            border-radius: 0.375rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .loading {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+        }
+
+        .loading::before {
+            content: '⏳';
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 0.375rem;
+        }
+
+        .error {
+            color: #dc2626;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+
+        .error::before {
+            content: '⚠️';
+            display: block;
+            font-size: 1.5rem;
+            margin-bottom: 0.375rem;
+        }
+
+        /* Modal body scrolling */
+        #modal-body {
+            height: calc(100% - 1rem);
+            overflow-y: auto;
+            padding-right: 0.25rem;
+        }
+
+        /* Minimal scrollbar */
+        #modal-body::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #modal-body::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 2px;
+        }
+
+        #modal-body::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+
+        #modal-body::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Responsive design */
+        @media (max-width: 640px) {
             .shelf-container {
                 padding: 1rem;
-                border: 1px solid #e2e8f0;
-                border-radius: 0.5rem;
-                background-color: #ffffff;
-                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
             }
+
             .grid-container {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-                gap: 1rem;
-                margin-bottom: 1rem;
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+                gap: 0.5rem;
             }
-            .grid-item {
-                position: relative;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-                padding: 0.5rem;
-                border: 1px solid #cbd5e1;
-                border-radius: 0.375rem;
-                background-color: #f8fafc;
-                transition: background-color 0.15s ease-in-out;
-            }
-            .grid-item:hover {
-                background-color: #f1f5f9;
-            }
-            .thumbnail {
-                width: 100%;
-                height: 90px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-bottom: 0.5rem;
-                background-color: #f1f5f9;
-                border-radius: 0.25rem;
-                overflow: hidden;
-            }
-            .thumbnail img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-            }
-            .icon {
-                font-size: 2.5rem;
-            }
-            .filename {
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-                font-size: 0.75rem;
-                color: #475569;
-                word-break: break-all;
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                -webkit-box-orient: vertical;
-                overflow: hidden;
-            }
-            .delete-btn {
-                position: absolute;
-                top: -0.5rem;
-                right: -0.5rem;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                width: 1.5rem;
-                height: 1.5rem;
-                border-radius: 50%;
-                border: none;
-                background-color: #ef4444;
-                color: white;
-                cursor: pointer;
-                font-size: 1rem;
-                line-height: 1;
-                transition: all 0.15s ease-in-out;
-                z-index: 10;
-                box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-            }
-            .delete-btn:hover {
-                background-color: #dc2626;
-                transform: scale(1.1);
-            }
-            .choose-media-btn {
-                display: inline-flex;
-                align-items: center;
-                padding: 0.5rem 1rem;
-                border: 1px solid #d1d5db;
-                border-radius: 0.375rem;
-                background-color: #ffffff;
-                font-weight: 500;
-                font-size: 0.875rem;
-                color: #374151;
-                cursor: pointer;
-                transition: all 0.15s ease-in-out;
-                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            }
-            .choose-media-btn:hover {
-                background-color: #f9fafb;
-                border-color: #9ca3af;
-            }
-            .choose-media-btn:focus {
-                outline: 2px solid #3b82f6;
-                outline-offset: 2px;
-            }
-            .empty-state {
-                grid-column: 1 / -1;
-                text-align: center;
-                padding: 2rem 1rem;
-                color: #64748b;
-            }
-            .empty-state p {
-                margin: 0;
-                font-size: 0.875rem;
-            }
-            .hidden {
-                display: none !important;
-            }
-            .modal-overlay {
-                position: fixed;
-                inset: 0;
-                background-color: rgba(0, 0, 0, 0.6);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 1000;
-            }
+
             .modal-content {
-                position: relative;
-                background-color: white;
-                padding: 2rem;
-                border-radius: 0.5rem;
-                width: 90%;
-                max-width: 800px;
-                height: 80vh;
-                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            }
-            .modal-close-btn {
-                position: absolute;
-                top: 0.75rem;
-                right: 0.75rem;
-                background: none;
-                border: none;
-                font-size: 1.5rem;
-                cursor: pointer;
-                color: #9ca3af;
-                transition: color 0.15s ease-in-out;
-            }
-            .modal-close-btn:hover {
-                color: #111827;
-            }
-            .loading, .error {
+                width: 95%;
+                height: 90vh;
                 padding: 1rem;
-                border-radius: 0.5rem;
             }
-            .loading {
-                border: 1px solid #e2e8f0;
-                background-color: #ffffff;
+
+            .filter-group {
+                flex-direction: column;
+                gap: 0.5rem;
             }
-            .error {
-                color: #dc2626;
-                background-color: #fef2f2;
-                border: 1px solid #fecaca;
-            }
-        `;
+        }
+    `;
     }
+
 
     private render() {
         this.shadow.innerHTML = `
             <style>${this.getStyles()}</style>
             <div class="shelf-container">
-                <div class="grid-container">
-                    ${this.files.length > 0
-            ? this.files.map(file => `
-                            <div class="grid-item">
-                                <button class="delete-btn" data-file-id="${file.id}">&times;</button>
-                                <div class="thumbnail">
-                                    ${file.type === 'image'
-                ? `<img src="/storage/${file.path}" alt="${file.filename}" loading="lazy">`
-                : `<span class="icon">${this.getFileIcon(file.type)}</span>`
-            }
-                                </div>
-                                <span class="filename">${file.filename}</span>
-                            </div>
-                        `).join('')
+        <div class="grid-container">
+            ${this.files.length > 0
+    ? this.files.map(file => `
+                    <div class="grid-item">
+                        <button class="delete-btn" data-file-id="${file.id}">&times;</button>
+            <div class="thumbnail">
+            ${file.type === 'image'
+? `<img src="/storage/${file.path}" alt="${file.filename}" loading="lazy">`
+    : `<span class="icon">${this.getFileIcon(file.type)}</span>`
+    }
+</div>
+<span class="filename">${file.filename}</span>
+        </div>
+            `).join('')
             : `<div class="empty-state">
-                    <p>No files attached. Click "Choose Media" to add some.</p>
-                </div>`
-        }
-                </div>
-                <button id="choose-media-btn" class="choose-media-btn">Choose Media</button>
-            </div>
-            <div class="modal-overlay ${this.isModalOpen ? '' : 'hidden'}">
-                <div class="modal-content">
-                    <button id="modal-close-btn" class="modal-close-btn">&times;</button>
-                    <div id="modal-body">${this.renderModalBody()}</div>
-                </div>
-            </div>
-                    `;
+        <p>No files attached. Click "Choose Media" to add some.</p>
+</div>`
+}
+</div>
+<button id="choose-media-btn" class="choose-media-btn">Choose Media</button>
+</div>
+<div class="modal-overlay ${this.isModalOpen ? '' : 'hidden'}">
+<div class="modal-content">
+<button id="modal-close-btn" class="modal-close-btn">&times;</button>
+<div id="modal-body">${this.renderModalBody()}</div>
+    </div>
+    </div>
+        `;
         this.attachEventListeners();
     }
 
     private renderModalBody(): string {
         if (this.isModalLoading) {
             return `<p>Loading media...</p>`;
-        }
+}
 
-        if (this.modalError) {
-            return `<p class="error">${this.modalError}</p>`;
-        }
+if (this.modalError) {
+    return `<p class="error">${this.modalError}</p>`;
+}
 
-        const filtersHtml = `
+const filtersHtml = `
         <form id="modal-filters-form" class="modal-filters">
             <div class="filter-group">
                 <input type="search" id="modal-search-input" placeholder="Search by filename..." value="${this.modalFilters.search}">
@@ -529,29 +806,29 @@ class FileShelf extends HTMLElement {
         </form>
     `;
 
-        if (this.modalData && this.modalData.data.length > 0) {
-            const filesHtml = this.modalData.data.map(file => {
-                const isAttached = this.attachedFileIds.has(file.id);
+if (this.modalData && this.modalData.data.length > 0) {
+    const filesHtml = this.modalData.data.map(file => {
+        const isAttached = this.attachedFileIds.has(file.id);
 
-                const buttonHtml = isAttached
-                    ? `<button class="detach-btn" data-file-id="${file.id}">Detach</button>`
-                    : `<button class="attach-btn" data-file-id="${file.id}">Attach</button>`;
+        const buttonHtml = isAttached
+            ? `<button class="detach-btn" data-file-id="${file.id}">Detach</button>`
+            : `<button class="attach-btn" data-file-id="${file.id}">Attach</button>`;
 
-                return `
+        return `
                     <div class="grid-item">
                         <div class="thumbnail">
                             ${file.type.startsWith('image')
-                    ? `<img src="/storage/${file.path}" alt="${file.filename}" loading="lazy">`
-                    : `<span class="icon">${this.getFileIcon(file.type as any)}</span>`
-                }
+            ? `<img src="/storage/${file.path}" alt="${file.filename}" loading="lazy">`
+            : `<span class="icon">${this.getFileIcon(file.type as any)}</span>`
+        }
                         </div>
                         <span class="filename">${file.filename}</span>
                         ${buttonHtml}
                     </div>
                 `;
-            }).join('');
+    }).join('');
 
-            const paginationHtml = `
+    const paginationHtml = `
                 <div class="pagination">
                     ${this.modalData.links.map(link => `
                         <a href="#"
@@ -562,89 +839,93 @@ class FileShelf extends HTMLElement {
                     `).join('')}
                 </div>`;
 
-            return `${filtersHtml}<div class="grid-container">${filesHtml}</div>${paginationHtml}`;
-        }
+    return `${filtersHtml}<div class="grid-container">${filesHtml}</div>${paginationHtml}`;
+}
 
-        return `${filtersHtml}<p>No media found.</p>`;
+return `${filtersHtml}<p>No media found.</p>`;
+}
+
+private attachEventListeners() {
+    this.shadow.querySelector('.grid-container')?.addEventListener('click', this.handleGridClick);
+    this.shadow.querySelector('#choose-media-btn')?.addEventListener('click', this.handleChooseMedia);
+    this.shadow.querySelector('#modal-close-btn')?.addEventListener('click', this.handleCloseModal);
+    this.shadow.querySelector('.modal-content')?.addEventListener('click', this.handleModalClick);
+
+    this.shadow.querySelector('#modal-filters-form')?.addEventListener('submit', this.handleFilterSubmit);
+
+    // Add change listeners for select dropdowns
+    this.shadow.querySelector('#modal-type-select')?.addEventListener('change', this.handleFilterChange);
+    this.shadow.querySelector('#modal-sort-select')?.addEventListener('change', this.handleFilterChange);
+}
+
+private handleFilterChange = (event: Event) => {
+    const target = event.target as HTMLSelectElement;
+
+    if (target.id === 'modal-type-select') {
+        this.modalFilters.type = target.value;
     }
-
-    private attachEventListeners() {
-        this.shadow.querySelector('.grid-container')?.addEventListener('click', this.handleGridClick);
-        this.shadow.querySelector('#choose-media-btn')?.addEventListener('click', this.handleChooseMedia);
-        this.shadow.querySelector('#modal-close-btn')?.addEventListener('click', this.handleCloseModal);
-        this.shadow.querySelector('.modal-content')?.addEventListener('click', this.handleModalClick);
-
-        this.shadow.querySelector('#modal-filters-form')?.addEventListener('submit', this.handleFilterSubmit);
+    if (target.id === 'modal-sort-select') {
+        this.modalFilters.sort = target.value;
     }
+    this.fetchAndRenderModalData();
+}
 
-    private handleFilterChange = (event: Event) => {
-        const target = event.target as HTMLSelectElement;
-
-        if (target.id === 'modal-type-select') {
-            this.modalFilters.type = target.value;
-        }
-        if (target.id === 'modal-sort-select') {
-            this.modalFilters.sort = target.value;
-        }
-        this.fetchAndRenderModalData();
+private handleFilterSubmit = (event: Event) => {
+    event.preventDefault();
+    const searchInput = this.shadow.querySelector('#modal-search-input') as HTMLInputElement;
+    if (searchInput) {
+        this.modalFilters.search = searchInput.value;
     }
-
-    private handleFilterSubmit = (event: Event) => {
-        event.preventDefault();
-        const searchInput = this.shadow.querySelector('#modal-search-input') as HTMLInputElement;
-        if (searchInput) {
-            this.modalFilters.search = searchInput.value;
-        }
-        this.fetchAndRenderModalData();
-    }
+    this.fetchAndRenderModalData();
+}
 
 
-    private renderLoading() {
-        this.shadow.innerHTML = `
+private renderLoading() {
+    this.shadow.innerHTML = `
             <style>${this.getStyles()}</style>
             <div class="loading">
                 <p>Loading files...</p>
             </div>
         `;
-    }
+}
 
-    private renderError(message: string) {
-        this.shadow.innerHTML = `
+private renderError(message: string) {
+    this.shadow.innerHTML = `
             <style>${this.getStyles()}</style>
             <div class="error">
                 <p>${message}</p>
             </div>
         `;
+}
+
+private getFileIcon(type: ShelfFile['type']): string {
+    switch (type) {
+        case 'image': return '🖼️';
+        case 'video': return '🎬';
+        case 'audio': return '🎵';
+        case 'document': return '📄';
+        case 'archive': return '📦';
+        default: return '❔';
     }
-
-    private getFileIcon(type: ShelfFile['type']): string {
-        switch (type) {
-            case 'image': return '🖼️';
-            case 'video': return '🎬';
-            case 'audio': return '🎵';
-            case 'document': return '📄';
-            case 'archive': return '📦';
-            default: return '❔';
-        }
-    }
+}
 
 
 
-    private renderModalContent(data: any) {
+private renderModalContent(data: any) {
 
-        this.modalContent = `
+    this.modalContent = `
         <h2>Choose Media</h2>
 
         ${data.data[0].id}
 
     `;
-        this.render();
-    }
+    this.render();
+}
 
-    private renderModalError(message: string) {
-        this.modalContent = `<p class="error">${message}</p>`;
-        this.render();
-    }
+private renderModalError(message: string) {
+    this.modalContent = `<p class="error">${message}</p>`;
+    this.render();
+}
 
 
 }
